@@ -73,6 +73,9 @@ pub(super) enum Maldon {
         init_code_hash: FixedBytes<32>,
         /// Pattern to search for. Must be hex digits only and between 1 and 20 characters.
         pattern: Pattern,
+        /// Tail pattern to search for. Must be hex digits only and between 1 and 20 characters.
+        #[clap(short, long)]
+        tail_pattern: Option<Pattern>,
     },
     /// Mines a CREATE3 salt.
     Create3 {
@@ -83,6 +86,9 @@ pub(super) enum Maldon {
         factory: Option<Address>,
         /// Pattern to search for. Must be hex digits only and between 1 and 20 characters.
         pattern: Pattern,
+        /// Tail pattern to search for. Must be hex digits only and between 1 and 20 characters.
+        #[clap(short, long)]
+        tail_pattern: Option<Pattern>,
     },
 }
 

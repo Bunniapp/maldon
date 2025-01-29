@@ -21,19 +21,43 @@ fn main() -> Result<(), hex::FromHexError> {
             factory,
             init_code_hash,
             pattern,
+            tail_pattern,
         } => {
             let factory = factory.unwrap_or(CREATE2_DEFAULT_FACTORY);
+            let tail: Option<&Vec<u8>>;
+            let bytes;
+            match tail_pattern {
+                Some(tail_pattern) => {
+                    bytes = tail_pattern.into_bytes()?;
+                    tail = Some(&bytes);
+                }
+                None => {
+                    tail = None;
+                }
+            }
 
-            Create2Miner::new(factory, deployer, init_code_hash).mine(&pattern.into_bytes()?)
+            Create2Miner::new(factory, deployer, init_code_hash).mine(&pattern.into_bytes()?, tail)
         }
         Maldon::Create3 {
             deployer,
             factory,
             pattern,
+            tail_pattern,
         } => {
             let factory = factory.unwrap_or(CREATE3_DEFAULT_FACTORY);
+            let tail: Option<&Vec<u8>>;
+            let bytes;
+            match tail_pattern {
+                Some(tail_pattern) => {
+                    bytes = tail_pattern.into_bytes()?;
+                    tail = Some(&bytes);
+                }
+                None => {
+                    tail = None;
+                }
+            }
 
-            Create3Miner::new(factory, deployer).mine(&pattern.into_bytes()?)
+            Create3Miner::new(factory, deployer).mine(&pattern.into_bytes()?, tail)
         }
     };
 

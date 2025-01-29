@@ -6,7 +6,7 @@ use alloy_primitives::{keccak256, Address, FixedBytes};
 
 pub(super) trait Miner {
     /// Runs the Miner.
-    fn mine(&self, pattern: &[u8]) -> (Address, FixedBytes<32>);
+    fn mine(&self, pattern: &[u8], tail_pattern: Option<&Vec<u8>>) -> (Address, FixedBytes<32>);
 }
 
 /// A CREATE2 Miner.
@@ -54,7 +54,7 @@ impl Create2Miner {
 }
 
 impl Miner for Create2Miner {
-    fn mine(&self, pattern: &[u8]) -> (Address, FixedBytes<32>) {
+    fn mine(&self, pattern: &[u8], tail_pattern: Option<&Vec<u8>>) -> (Address, FixedBytes<32>) {
         let mut rng = thread_rng();
 
         let mut hash_buffer = [0u8; 85];
@@ -80,12 +80,22 @@ impl Miner for Create2Miner {
                     let hash = keccak256(to_hash);
 
                     // check wether we have a match
-                    hash[12..].starts_with(pattern).then(|| {
-                        (
-                            Address::from_slice(&hash[12..32]),
-                            FixedBytes::<32>::from_slice(&to_hash[21..53]),
-                        )
-                    })
+                    match tail_pattern {
+                        Some(tail_pattern) => (hash[12..].starts_with(pattern)
+                            && hash.ends_with(tail_pattern))
+                        .then(|| {
+                            (
+                                Address::from_slice(&hash[12..32]),
+                                FixedBytes::<32>::from_slice(&to_hash[21..53]),
+                            )
+                        }),
+                        None => hash[12..].starts_with(pattern).then(|| {
+                            (
+                                Address::from_slice(&hash[12..32]),
+                                FixedBytes::<32>::from_slice(&to_hash[21..53]),
+                            )
+                        }),
+                    }
                 });
 
             // Exists the loop.
@@ -114,7 +124,7 @@ impl Create3Miner {
 }
 
 impl Miner for Create3Miner {
-    fn mine(&self, pattern: &[u8]) -> (Address, FixedBytes<32>) {
+    fn mine(&self, pattern: &[u8], tail_pattern: Option<&Vec<u8>>) -> (Address, FixedBytes<32>) {
         let mut rng = thread_rng();
 
         let mut salt = [0u8; 32];
@@ -141,9 +151,14 @@ impl Miner for Create3Miner {
                 proxy_create_buffer[2..22].copy_from_slice(proxy.as_slice());
                 let hash = keccak256(proxy_create_buffer);
 
-                hash[12..]
-                    .starts_with(pattern)
-                    .then(|| (Address::from_slice(&hash[12..32]), salt.into()))
+                match tail_pattern {
+                    Some(tail_pattern) => (hash[12..].starts_with(pattern)
+                        && hash.ends_with(tail_pattern))
+                    .then(|| (Address::from_slice(&hash[12..32]), salt.into())),
+                    None => hash[12..]
+                        .starts_with(pattern)
+                        .then(|| (Address::from_slice(&hash[12..32]), salt.into())),
+                }
             });
 
             // Exists the loop.
