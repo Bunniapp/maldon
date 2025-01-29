@@ -36,8 +36,9 @@ Arguments:
   <PATTERN>         Pattern to search for. Must be hex digits only and between 1 and 20 characters
 
 Options:
-  -f, --factory <FACTORY>  Address of the Factory contract. Defaults to the Immutable CREATE2 Factory by 0age
-  -h, --help               Print help
+  -f, --factory <FACTORY>            Address of the Factory contract. Defaults to the Immutable CREATE2 Factory by 0age
+  -t, --tail-pattern <TAIL_PATTERN>  Tail pattern to search for. Must be hex digits only and between 1 and 20 characters
+  -h, --help                         Print help
 
 Usage: maldon create3 [OPTIONS] <DEPLOYER> <PATTERN>
 
@@ -46,6 +47,7 @@ Arguments:
   <PATTERN>   Pattern to search for. Must be hex digits only and between 1 and 20 characters
 
 Options:
-  -f, --factory <FACTORY>  Address of the Factory contract. Defaults to the Aori Factory
-  -h, --help               Print help
+  -f, --factory <FACTORY>            Address of the Factory contract. Defaults to the Aori Factory
+  -t, --tail-pattern <TAIL_PATTERN>  Tail pattern to search for. Must be hex digits only and between 1 and 20 characters
+  -h, --help                         Print help
 ```
